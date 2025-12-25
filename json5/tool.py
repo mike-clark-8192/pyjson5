@@ -66,16 +66,29 @@ def main(argv=None, host=None):
         args.quote_style = json5.QuoteStyle.ALWAYS_DOUBLE.value
         args.multiline = False
 
-    obj = json5.loads(inp, strict=args.strict)
-    s = json5.dumps(
-        obj,
-        indent=args.indent,
-        quote_keys=args.quote_keys,
-        trailing_commas=args.trailing_commas,
-        quote_style=QUOTE_STYLES[args.quote_style],
-        multiline=args.multiline,
-    )
-    host.print(s)
+    if args.json_lines:
+        for line in inp.splitlines():
+            obj = json5.loads(line, strict=args.strict)
+            s = json5.dumps(
+                obj,
+                indent=args.indent,
+                quote_keys=args.quote_keys,
+                trailing_commas=args.trailing_commas,
+                quote_style=QUOTE_STYLES[args.quote_style],
+                multiline=args.multiline,
+            )
+            host.print(s)
+    else:
+        obj = json5.loads(inp, strict=args.strict)
+        s = json5.dumps(
+            obj,
+            indent=args.indent,
+            quote_keys=args.quote_keys,
+            trailing_commas=args.trailing_commas,
+            quote_style=QUOTE_STYLES[args.quote_style],
+            multiline=args.multiline,
+        )
+        host.print(s)
     return 0
 
 
@@ -175,6 +188,12 @@ def _parse_args(host, argv):
         dest='strict',
         action='store_false',
         help='Allow control characters (\\x00-\\x1f) in strings',
+    )
+    parser.add_argument(
+        '--json-lines',
+        action='store_true',
+        default=False,
+        help='Parse input as JSON Lines / jsonl (one JSON document per line).',
     )
     parser.add_argument(
         '--quote-style',

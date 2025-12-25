@@ -152,6 +152,28 @@ class ToolTest(unittest.TestCase):
             out='{\n    foo: "a\\n\\\nb",\n}\n',
         )
 
+    def test_json_lines(self):
+        self.check(
+            ['--json-lines'],
+            stdin='{foo: 1}\n{bar: 2}\n',
+            out='{\n    foo: 1,\n}\n{\n    bar: 2,\n}\n',
+        )
+
+    def test_json_lines_with_multiline(self):
+        self.check(
+            ['--json-lines', '--multiline'],
+            stdin='{foo: "a\\nb"}\n{bar: "x"}\n',
+            out=(
+                '{\n'
+                '    foo: "a\\n\\\n'
+                'b",\n'
+                '}\n'
+                '{\n'
+                '    bar: "x",\n'
+                '}\n'
+            ),
+        )
+
     def test_quote_keys(self):
         self.check(
             ['--quote-keys', '-c', '{foo: 1}'],
