@@ -64,6 +64,7 @@ def main(argv=None, host=None):
         args.quote_keys = True
         args.trailing_commas = False
         args.quote_style = json5.QuoteStyle.ALWAYS_DOUBLE.value
+        args.multiline = False
 
     obj = json5.loads(inp, strict=args.strict)
     s = json5.dumps(
@@ -72,6 +73,7 @@ def main(argv=None, host=None):
         quote_keys=args.quote_keys,
         trailing_commas=args.trailing_commas,
         quote_style=QUOTE_STYLES[args.quote_style],
+        multiline=args.multiline,
     )
     host.print(s)
     return 0
@@ -181,6 +183,16 @@ def _parse_args(host, argv):
         choices=QUOTE_STYLES.keys(),
         help='Controls how strings are encoded. By default they are always '
         'double-quoted ("always_double")',
+    )
+    parser.add_argument(
+        '-m',
+        '--multiline',
+        action='store_true',
+        default=False,
+        help='Fold embedded newlines in strings into JSON5 multiline string '
+        'literals (using a trailing "\\" at end-of-line). Note: continuation '
+        'lines are not indented, otherwise indentation would become part of '
+        'the string value.',
     )
     parser.add_argument(
         'file',

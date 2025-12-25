@@ -710,6 +710,11 @@ class TestDumps(unittest.TestCase):
             r'"\u2028\u2029\b\t\f\n\r\v\\\0"',
         )
 
+    def test_multiline_strings(self):
+        self.assertEqual(json5.dumps('a\nb'), r'"a\nb"')
+        self.assertEqual(json5.dumps('a\nb', multiline=True), '"a\\n\\\nb"')
+        self.assertEqual(json5.dumps(r'a\nb', multiline=True), r'"a\\nb"')
+
     def test_string_quote_styles(self):
         def checkp(**kwargs):
             return lambda obj, s: self.assertEqual(

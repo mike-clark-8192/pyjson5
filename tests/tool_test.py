@@ -146,6 +146,12 @@ class ToolTest(unittest.TestCase):
             out='{\n    "foo": 1\n}\n',
         )
 
+    def test_multiline(self):
+        self.check(
+            ['--multiline', '-c', '{foo: "a\\nb"}'],
+            out='{\n    foo: "a\\n\\\nb",\n}\n',
+        )
+
     def test_quote_keys(self):
         self.check(
             ['--quote-keys', '-c', '{foo: 1}'],

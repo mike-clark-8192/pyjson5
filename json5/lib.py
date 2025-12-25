@@ -402,6 +402,7 @@ def dump(
     trailing_commas: bool = True,
     allow_duplicate_keys: bool = True,
     quote_style: QuoteStyle = QuoteStyle.ALWAYS_DOUBLE,
+    multiline: bool = False,
     **kw,
 ):
     """Serialize ``obj`` to a JSON5-formatted stream to ``fp``,
@@ -430,6 +431,7 @@ def dump(
             trailing_commas=trailing_commas,
             allow_duplicate_keys=allow_duplicate_keys,
             quote_style=quote_style,
+            multiline=multiline,
             **kw,
         )
     )
@@ -451,6 +453,7 @@ def dumps(
     trailing_commas: bool = True,
     allow_duplicate_keys: bool = True,
     quote_style: QuoteStyle = QuoteStyle.ALWAYS_DOUBLE,
+    multiline: bool = False,
     **kw: Any,
 ):
     """Serialize ``obj`` to a JSON5-formatted string.
@@ -487,6 +490,12 @@ def dumps(
       by this parameter and remain unquoted.
 
       *`quote_style` was added in version 0.10.0*.
+
+    - If `multiline` is true, strings containing newline characters will be
+      encoded using JSON5's multi-line string literal syntax (a `\\` at the end
+      of the line to continue reading the string on the next line). Note that
+      continuation lines are not indented, because leading spaces would become
+      part of the string value.
 
     Other keyword arguments are allowed and will be passed to the
     encoder so custom encoders can get them, but otherwise they will
@@ -541,6 +550,7 @@ def dumps(
         trailing_commas=trailing_commas,
         allow_duplicate_keys=allow_duplicate_keys,
         quote_style=quote_style,
+        multiline=multiline,
         **kw,
     )
     return enc.encode(obj, seen=set(), level=0, as_key=False)
@@ -562,6 +572,7 @@ class JSON5Encoder:
         trailing_commas: bool = True,
         allow_duplicate_keys: bool = True,
         quote_style: QuoteStyle = QuoteStyle.ALWAYS_DOUBLE,
+        multiline: bool = False,
         **kw,
     ):
         """Provides a class that may be overridden to customize the behavior
@@ -586,6 +597,7 @@ class JSON5Encoder:
         self.trailing_commas = trailing_commas
         self.allow_duplicate_keys = allow_duplicate_keys
         self.quote_style = quote_style
+        self.multiline = multiline
 
     def default(self, obj: Any) -> Any:
         """Provides a last-ditch option to encode a value that the encoder
@@ -702,7 +714,9 @@ class JSON5Encoder:
         sq = "'"
         dq = '"'
         for ch in obj:
-            if ch == dq:
+            if ch == '\n' and self.multiline:
+                encoded_ch = r'\n' + '\\\n'
+            elif ch == dq:
                 # At first we will guess at which quotes to escape. If
                 # we guess wrong, we reencode the string below.
                 double_quotes_seen += 1

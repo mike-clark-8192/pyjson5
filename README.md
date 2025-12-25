@@ -65,34 +65,35 @@ of the tools), but they may not run completely cleanly.
 #### On Mac
 
 The easiest thing to do is to install [`uv`](https://docs.astral.sh/uv) and
-use `uv` and the `//run` script to develop things. See `./run --help` for
-the various commands that are supported. `glop` is the parser generator
-tool used to generate a parser from the grammar in `json5/json5.g`.
+use `uv` and `just` to develop things. See `just --list` for the commands that
+are supported. `glop` is the parser generator tool used to generate a parser
+from the grammar in `json5/json5.g`.
 
 ```
 $ brew install uv
+$ brew install just
 $ git clone https://github.com/dpranke/pyjson5
 $ git clone https://github.com/dpranke/glop
 $ cd pyjson5
-$ source $(./run devenv)  # To activate a venv w/ all the needed dev tools.
+$ uv sync --extra dev
+$ source .venv/bin/activate  # To activate a venv w/ all the needed dev tools.
 ```
 
 #### On other platforms
 
 Install `uv` via whatever mechanism is appropriate.
+Install `just` via whatever mechanism is appropriate.
 
 ### Create the venv
 
 ```
-$ ./run devenv
+$ uv sync --extra dev
 ```
-
-(This calls `uv sync --extra dev`.)
 
 ### Running the tests
 
 ```
-$ ./run tests
+$ just test
 ```
 
 ### Updating the packages
@@ -100,12 +101,12 @@ $ ./run tests
 ```
 # Update the version in json5/version.py to $VERSION, which should be of
 # the form X.Y.Z where X, Y, and Z are numbers.
-$ ./run regen
-$ ./run presubmit
+$ just regen
+$ just presubmit
 $ git commit -a -m "Bump the version to $VERSION"
 $ git tag "v$VERSION"
-$ ./run build
-$ ./run publish --prod
+$ just build
+$ just publish-prod
 $ git push origin
 $ git push --tags origin
 ```
@@ -168,7 +169,7 @@ $ git push --tags origin
       completely backwards-compatible. Code without changes should run exactly
       as it did before.
 * v0.9.28 (2024-11-11)
-    * Fix GitHub CI to install `uv` so `./run tests` works properly.
+    * Fix GitHub CI to install `uv` so `just test` works properly.
     * Mark Python3.13 as supported in package metadata.
     * Update dev package dependencies (note that the latest versions
       of coverage and pylint no longer work w/ Python3.8)
@@ -214,7 +215,7 @@ $ git push --tags origin
     * Added `json5.__version__` in addition to `json5.VERSION`.
     * More packaging modernization (no more setup.{cfg,py} files).
     * Mark Python3.12 as supported in project.classifiers.
-    * Updated the `//run` script to use python3.
+    * Updated the dev tooling to use python3.
 * v0.9.19 (2024-03-03)
     * Replaced the benchmarking data files that came from chromium.org with
       three files obtained from other datasets on GitHub. Since this repo

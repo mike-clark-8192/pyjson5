@@ -95,7 +95,7 @@ disable = [
 reports = "no"
 score = "no"
 [tool.ruff]
-include = [ "run", "*/*.py" ]
+include = [ "*/*.py" ]
 line-length = 79
 
 [tool.ruff.format]
